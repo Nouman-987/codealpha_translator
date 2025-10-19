@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Language Translation Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      text-align: center;
+    }
+    select, textarea, button {
+      width: 90%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      min-height: 60px;
+    }
+    .actions button {
+      width: 45%;
+      background-color: #007BFF;
+      margin: 5px;
+    }
+    .actions button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🌍 Language Translation Tool</h2>
+
+    <textarea id="inputText" rows="4" placeholder="Enter text to translate..."></textarea>
+
+    <select id="sourceLang">
+      <option value="en">English</option>
+      <option value="ur">Urdu</option>
+      <option value="fr">French</option>
+      <option value="es">Spanish</option>
+      <option value="de">German</option>
+      <option value="ar">Arabic</option>
+    </select>
+
+    <select id="targetLang">
+      <option value="ur">Urdu</option>
+      <option value="en">English</option>
+      <option value="fr">French</option>
+      <option value="es">Spanish</option>
+      <option value="de">German</option>
+      <option value="ar">Arabic</option>
+    </select>
+
+    <button onclick="translateText()">Translate</button>
+
+    <div id="output"></div>
+
+    <div class="actions">
+      <button onclick="copyText()">📋 Copy</button>
+      <button onclick="speakText()">🔊 Speak</button>
+    </div>
+  </div>
+
+  <script>
+    async function translateText() {
+      const text = document.getElementById("inputText").value.trim();
+      const sourceLang = document.getElementById("sourceLang").value;
+      const targetLang = document.getElementById("targetLang").value;
+      const output = document.getElementById("output");
+
+      if (!text) {
+        output.innerText = "⚠️ Please enter text to translate.";
+        return;
+      }
+
+      output.innerText = "⏳ Translating...";
+
+      try {
+        const res = await fetch(
+          `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`
+        );
+        const data = await res.json();
+        output.innerText = data.responseData.translatedText || "Translation failed.";
+      } catch (err) {
+        output.innerText = "❌ Error: Unable to translate.";
+      }
+    }
+
+    function copyText() {
+      const text = document.getElementById("output").innerText;
+      navigator.clipboard.writeText(text);
+      alert("✅ Translated text copied!");
+    }
+
+    function speakText() {
+      const text = document.getElementById("output").innerText;
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
